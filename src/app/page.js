@@ -47,183 +47,246 @@ export default function Home() {
   };
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl fade-in">
-      {/* 성공 토스트 알림 */}
-      {showSuccess && (
-        <div className="toast alert-success">
-          <div className="flex items-center">
-            <span className="text-xl mr-2">🎉</span>
-            <span>주제가 성공적으로 추가되었습니다!</span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* 배경 파티클 효과 */}
+      <div className="particles">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="particle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 6}s`,
+              width: `${Math.random() * 4 + 2}px`,
+              height: `${Math.random() * 4 + 2}px`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="container mx-auto p-4 max-w-6xl relative z-10">
+        {/* 성공 토스트 알림 */}
+        {showSuccess && (
+          <div className="fixed top-4 right-4 z-50 toast alert-success modern-card neon-glow animate-bounce">
+            <div className="flex items-center">
+              <span className="text-2xl mr-3">🎉</span>
+              <span className="font-semibold">주제가 성공적으로 추가되었습니다!</span>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Redux 통계 및 실시간 정보 */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-bold mb-4 flex items-center text-purple-800">
-            <span className="text-2xl mr-2">📊</span>
+      <div className="grid md:grid-cols-2 gap-8 mb-12">
+        <div className="glass-card p-8 modern-card floating">
+          <h3 className="text-2xl font-bold mb-6 flex items-center gradient-text">
+            <span className="text-3xl mr-3 animate-pulse">📊</span>
             Redux 상태 통계
           </h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-purple-50 p-4 rounded-lg text-center">
-              <div className="text-2xl font-bold text-purple-600">{statistics.total}</div>
-              <div className="text-sm text-purple-700">전체 주제</div>
-            </div>
-            <div className="bg-green-50 p-4 rounded-lg text-center">
-              <div className="text-2xl font-bold text-green-600">{statistics.createdToday}</div>
-              <div className="text-sm text-green-700">오늘 생성</div>
-            </div>
-            <div className="bg-blue-50 p-4 rounded-lg text-center">
-              <div className="text-2xl font-bold text-blue-600">{statistics.updatedToday}</div>
-              <div className="text-sm text-blue-700">오늘 수정</div>
-            </div>
-            <div className="bg-yellow-50 p-4 rounded-lg text-center">
-              <div className="text-2xl font-bold text-yellow-600">
-                {loading ? '⏳' : '✅'}
+          <div className="grid grid-cols-2 gap-6">
+            <div className="bg-gradient-to-br from-purple-100 to-purple-200 p-6 rounded-2xl text-center modern-card bounce-scale">
+              <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+                {statistics.total}
               </div>
-              <div className="text-sm text-yellow-700">상태</div>
+              <div className="text-sm font-medium text-purple-700 mt-2">전체 주제</div>
+            </div>
+            <div className="bg-gradient-to-br from-green-100 to-green-200 p-6 rounded-2xl text-center modern-card bounce-scale">
+              <div className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+                {statistics.createdToday}
+              </div>
+              <div className="text-sm font-medium text-green-700 mt-2">오늘 생성</div>
+            </div>
+            <div className="bg-gradient-to-br from-blue-100 to-blue-200 p-6 rounded-2xl text-center modern-card bounce-scale">
+              <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+                {statistics.updatedToday}
+              </div>
+              <div className="text-sm font-medium text-blue-700 mt-2">오늘 수정</div>
+            </div>
+            <div className="bg-gradient-to-br from-yellow-100 to-orange-200 p-6 rounded-2xl text-center modern-card bounce-scale">
+              <div className="text-3xl font-bold">
+                {loading ? (
+                  <span className="animate-spin text-yellow-600">⏳</span>
+                ) : (
+                  <span className="text-green-600 animate-pulse">✅</span>
+                )}
+              </div>
+              <div className="text-sm font-medium text-yellow-700 mt-2">상태</div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-bold mb-4 flex items-center text-teal-800">
-            <span className="text-2xl mr-2">⏰</span>
+        <div className="glass-card p-8 modern-card floating" style={{animationDelay: '0.5s'}}>
+          <h3 className="text-2xl font-bold mb-6 flex items-center gradient-text">
+            <span className="text-3xl mr-3 neon-glow text-teal-400">⏰</span>
             실시간 정보
           </h3>
-          <div className="space-y-3">
-            <div className="bg-teal-50 p-3 rounded-lg">
-              <div className="font-semibold text-teal-700">현재 시간</div>
-              <div className="text-teal-600">{formattedCurrentTime}</div>
+          <div className="space-y-4">
+            <div className="bg-gradient-to-r from-teal-50 to-cyan-50 p-4 rounded-xl border border-teal-100 wave-effect">
+              <div className="font-semibold text-teal-800 text-lg">현재 시간</div>
+              <div className="text-teal-600 font-mono text-xl typing-cursor">{formattedCurrentTime}</div>
             </div>
             {todayHolidays.length > 0 && (
-              <div className="bg-red-50 p-3 rounded-lg">
-                <div className="font-semibold text-red-700">오늘의 공휴일</div>
+              <div className="bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-xl border border-red-100 modern-card">
+                <div className="font-semibold text-red-800 text-lg flex items-center">
+                  <span className="mr-2 animate-bounce">🎉</span>
+                  오늘의 공휴일
+                </div>
                 {todayHolidays.map((holiday, index) => (
-                  <div key={index} className="text-red-600">{holiday.name}</div>
+                  <div key={index} className="text-red-600 font-medium">{holiday.name}</div>
                 ))}
               </div>
             )}
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <div className="font-semibold text-gray-700">Redux 연결</div>
+            <div className="bg-gradient-to-r from-gray-50 to-slate-50 p-4 rounded-xl border border-gray-100 hologram">
+              <div className="font-semibold text-gray-800 text-lg">Redux 연결</div>
               <div className="flex items-center text-gray-600">
-                <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                실시간 동기화
+                <span className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse neon-glow"></span>
+                <span className="font-medium">실시간 동기화</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="text-center mb-8">
-        <h2 className="text-4xl font-bold mb-4 typing-effect">Axios 사용 예제</h2>
-        <p className="text-lg mb-6 text-gray-600">실시간 데이터 관리를 체험해보세요</p>
-        <div className="flex justify-center items-center space-x-4 mb-6">
-          <img src="/next.svg" width="60" alt="Next.js" className="animate-pulse" />
-          <span className="text-2xl">+</span>
-          <div className="flex items-center bg-white bg-opacity-80 px-3 py-1 rounded-full">
-            <span className="text-sm font-semibold text-gray-700">Axios</span>
-          </div>
-          <span className="text-2xl">+</span>
-          <div className="flex items-center bg-white bg-opacity-80 px-3 py-1 rounded-full">
-            <span className="text-sm font-semibold text-gray-700">Moment.js</span>
-          </div>
-        </div>
-        
-        {/* 추가 데모 페이지 링크 */}
-        <div className="flex justify-center space-x-4 mb-6 flex-wrap gap-2">
-          <Link
-            href="/axios-examples"
-            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 glitter-effect"
-          >
-            <span className="flex items-center">
-              <span className="mr-2">🔗</span>
-              Axios 고급 예제
-            </span>
-          </Link>
-          <Link
-            href="/moment-demo"
-            className="bg-gradient-to-r from-green-500 to-teal-600 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-teal-700 transition-all duration-300 transform hover:scale-105 glitter-effect"
-          >
-            <span className="flex items-center">
-              <span className="mr-2">⏰</span>
-              Moment.js 데모
-            </span>
-          </Link>
-          <Link
-            href="/redux-demo"
-            className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 glitter-effect"
-          >
-            <span className="flex items-center">
-              <span className="mr-2">🏪</span>
-              Redux 데모
-            </span>
-          </Link>
-        </div>
-      </div>
-      
-      <div className="window mb-8">
-        <div className="window-controls">
-          <div className="window-control red"></div>
-          <div className="window-control yellow"></div>
-          <div className="window-control green"></div>
-        </div>
-        <div className="pt-8 p-6">
-          <h3 className="text-xl font-semibold mb-4 flex items-center">
-            <span className="text-2xl mr-2">✨</span>
-            새 주제 추가
-          </h3>
-          <form onSubmit={handleAddTopic} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
-                📝 제목
-              </label>
-              <input
-                type="text"
-                value={newTopicTitle}
-                onChange={(e) => setNewTopicTitle(e.target.value)}
-                className="w-full glitter-effect"
-                placeholder="주제 제목을 입력하세요"
-                required
-              />
+        <div className="text-center mb-12">
+          <h2 className="text-6xl font-bold mb-6 gradient-text-rainbow floating">
+            Modern Tech Stack
+          </h2>
+          <p className="text-xl mb-8 text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            Next.js, Axios, Moment.js, Redux의 완벽한 조화로 만든 현대적 웹 애플리케이션
+          </p>
+          <div className="flex justify-center items-center space-x-6 mb-8 flex-wrap gap-4">
+            <div className="flex items-center bg-white bg-opacity-20 backdrop-blur-sm px-6 py-3 rounded-full border border-white border-opacity-30 modern-card">
+              <img src="/next.svg" width="40" alt="Next.js" className="animate-pulse mr-3" />
+              <span className="font-semibold text-gray-800">Next.js 15</span>
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
-                📄 내용
-              </label>
-              <textarea
-                value={newTopicBody}
-                onChange={(e) => setNewTopicBody(e.target.value)}
-                className="w-full glitter-effect"
-                rows="4"
-                placeholder="주제 내용을 입력하세요"
-                required
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-500">
-                {newTopicTitle.length}/50 글자 • {newTopicBody.length}/200 글자
+            <span className="text-3xl animate-pulse">+</span>
+            <div className="flex items-center bg-white bg-opacity-20 backdrop-blur-sm px-6 py-3 rounded-full border border-white border-opacity-30 modern-card">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-white font-bold text-sm">A</span>
               </div>
-              <button
-                type="submit"
-                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 glitter-effect"
-                disabled={loading || !newTopicTitle.trim() || !newTopicBody.trim()}
-              >
-                {loading ? (
-                  <span className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    추가 중...
-                  </span>
-                ) : (
-                  <span className="flex items-center">
-                    <span className="mr-2">🚀</span>
-                    주제 추가
-                  </span>
-                )}
-              </button>
+              <span className="font-semibold text-gray-800">Axios</span>
             </div>
-          </form>
+            <span className="text-3xl animate-pulse">+</span>
+            <div className="flex items-center bg-white bg-opacity-20 backdrop-blur-sm px-6 py-3 rounded-full border border-white border-opacity-30 modern-card">
+              <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-white font-bold text-sm">M</span>
+              </div>
+              <span className="font-semibold text-gray-800">Moment.js</span>
+            </div>
+            <span className="text-3xl animate-pulse">+</span>
+            <div className="flex items-center bg-white bg-opacity-20 backdrop-blur-sm px-6 py-3 rounded-full border border-white border-opacity-30 modern-card">
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-white font-bold text-sm">R</span>
+              </div>
+              <span className="font-semibold text-gray-800">Redux</span>
+            </div>
+          </div>
+          
+          {/* 데모 페이지 링크 */}
+          <div className="flex justify-center space-x-4 mb-6 flex-wrap gap-4">
+            <Link
+              href="/axios-examples"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-2xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 modern-card shadow-xl magnetic"
+            >
+              <span className="flex items-center font-semibold">
+                <span className="mr-3 text-xl">🔗</span>
+                Axios 고급 예제
+              </span>
+            </Link>
+            <Link
+              href="/moment-demo"
+              className="bg-gradient-to-r from-green-500 to-teal-600 text-white px-8 py-4 rounded-2xl hover:from-green-600 hover:to-teal-700 transition-all duration-300 transform hover:scale-105 modern-card shadow-xl magnetic"
+            >
+              <span className="flex items-center font-semibold">
+                <span className="mr-3 text-xl">⏰</span>
+                Moment.js 데모
+              </span>
+            </Link>
+            <Link
+              href="/redux-demo"
+              className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-8 py-4 rounded-2xl hover:from-purple-600 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 modern-card shadow-xl magnetic"
+            >
+              <span className="flex items-center font-semibold">
+                <span className="mr-3 text-xl">🏪</span>
+                Redux 데모
+              </span>
+            </Link>
+          </div>
+        </div>
+      
+      <div className="glass-card mb-12 modern-card spectrum-border">
+        <div className="bg-white bg-opacity-80 backdrop-blur-sm rounded-2xl">
+          <div className="p-8">
+            <h3 className="text-3xl font-bold mb-6 flex items-center gradient-text">
+              <span className="text-4xl mr-4 floating">✨</span>
+              새 주제 추가
+            </h3>
+            <form onSubmit={handleAddTopic} className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-lg font-semibold mb-3 text-gray-800 flex items-center">
+                    <span className="mr-2 text-xl">📝</span>
+                    제목
+                  </label>
+                  <input
+                    type="text"
+                    value={newTopicTitle}
+                    onChange={(e) => setNewTopicTitle(e.target.value)}
+                    className="w-full px-6 py-4 rounded-2xl border-2 border-gray-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 transition-all duration-300 text-lg backdrop-blur-sm bg-white bg-opacity-90 modern-card"
+                    placeholder="✍️ 주제 제목을 입력하세요..."
+                    required
+                  />
+                  <div className="text-right text-sm text-gray-500 mt-2">
+                    <span className={newTopicTitle.length > 40 ? 'text-orange-500' : 'text-gray-500'}>
+                      {newTopicTitle.length}/50 글자
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-lg font-semibold mb-3 text-gray-800 flex items-center">
+                    <span className="mr-2 text-xl">📄</span>
+                    내용
+                  </label>
+                  <textarea
+                    value={newTopicBody}
+                    onChange={(e) => setNewTopicBody(e.target.value)}
+                    className="w-full px-6 py-4 rounded-2xl border-2 border-gray-200 focus:border-purple-400 focus:ring-4 focus:ring-purple-100 transition-all duration-300 text-lg backdrop-blur-sm bg-white bg-opacity-90 modern-card resize-none"
+                    rows="6"
+                    placeholder="📝 주제 내용을 상세히 입력하세요..."
+                    required
+                  />
+                  <div className="text-right text-sm text-gray-500 mt-2">
+                    <span className={newTopicBody.length > 180 ? 'text-orange-500' : 'text-gray-500'}>
+                      {newTopicBody.length}/200 글자
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between pt-6">
+                <div className="text-sm text-gray-600 flex items-center">
+                  <span className="w-3 h-3 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+                  실시간 저장 준비
+                </div>
+                <button
+                  type="submit"
+                  className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 text-white px-12 py-4 rounded-2xl hover:from-purple-700 hover:via-pink-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 modern-card shadow-2xl magnetic neon-glow font-bold text-lg"
+                  disabled={loading || !newTopicTitle.trim() || !newTopicBody.trim()}
+                >
+                  {loading ? (
+                    <span className="flex items-center">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
+                      추가 중...
+                    </span>
+                  ) : (
+                    <span className="flex items-center">
+                      <span className="mr-3 text-xl">🚀</span>
+                      주제 추가하기
+                    </span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
       
@@ -417,6 +480,7 @@ export default function Home() {
             <div className="progress-fill" style={{width: '100%'}}></div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

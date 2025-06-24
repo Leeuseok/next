@@ -49,21 +49,38 @@ export default function ReduxDemo() {
   const fullState = useSelector(state => state);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 py-8 relative overflow-hidden">
+      {/* 배경 파티클 효과 */}
+      <div className="particles">
+        {[...Array(25)].map((_, i) => (
+          <div
+            key={i}
+            className="particle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 6}s`,
+              width: `${Math.random() * 5 + 2}px`,
+              height: `${Math.random() * 5 + 2}px`,
+              background: `hsl(${240 + Math.random() * 120}, 70%, 70%)`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 relative z-10">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-12 text-center">
           <Link 
             href="/" 
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4"
+            className="inline-flex items-center text-purple-600 hover:text-purple-800 mb-6 modern-card bg-white bg-opacity-70 px-6 py-3 rounded-full backdrop-blur-sm transition-all duration-300 font-semibold"
           >
-            ← 홈으로 돌아가기
+            <span className="mr-2">←</span> 홈으로 돌아가기
           </Link>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Redux Toolkit 데모 페이지
+          <h1 className="text-6xl font-bold gradient-text-rainbow mb-6 floating">
+            Redux Toolkit 상태 마법사 🏪
           </h1>
-          <p className="text-gray-600">
-            Redux의 상태 관리 기능과 실시간 데이터 동기화를 확인해보세요.
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Redux의 강력한 상태 관리와 실시간 데이터 동기화를 직접 체험해보세요.
           </p>
         </div>
 

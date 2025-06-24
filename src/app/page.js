@@ -3,10 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useTopics } from "../hooks/useTopics";
+import { useReduxTopics } from "../hooks/useReduxTopics";
+import { useReduxDateTime } from "../hooks/useReduxDateTime";
+import { formatRelativeTime, formatKoreanDate, getCurrentKoreanTime } from "../lib/moment-utils";
 
 export default function Home() {
-  const { topics, loading, error, addTopic, deleteTopic } = useTopics();
+  const { topics, loading, error, statistics, addTopic, removeTopic } = useReduxTopics();
+  const { formattedCurrentTime, todayHolidays } = useReduxDateTime();
   const [newTopicTitle, setNewTopicTitle] = useState('');
   const [newTopicBody, setNewTopicBody] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
@@ -18,8 +21,11 @@ export default function Home() {
     try {
       await addTopic({
         title: newTopicTitle,
-        body: newTopicBody
-      });
+        body: newTopicBody,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }).unwrap(); // unwrap을 사용해서 rejected promise를 throw하도록 함
+      
       setNewTopicTitle('');
       setNewTopicBody('');
       setShowSuccess(true);
@@ -27,7 +33,16 @@ export default function Home() {
       // 성공 메시지 3초 후 숨기기
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (err) {
-      // 에러는 이미 커스텀 훅에서 처리됨
+      // 에러는 이미 Redux에서 처리됨
+      console.error('Failed to add topic:', err);
+    }
+  };
+
+  const handleDeleteTopic = async (id) => {
+    try {
+      await removeTopic(id).unwrap();
+    } catch (err) {
+      console.error('Failed to delete topic:', err);
     }
   };
 
@@ -43,6 +58,64 @@ export default function Home() {
         </div>
       )}
 
+      {/* Redux 통계 및 실시간 정보 */}
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-bold mb-4 flex items-center text-purple-800">
+            <span className="text-2xl mr-2">📊</span>
+            Redux 상태 통계
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-purple-50 p-4 rounded-lg text-center">
+              <div className="text-2xl font-bold text-purple-600">{statistics.total}</div>
+              <div className="text-sm text-purple-700">전체 주제</div>
+            </div>
+            <div className="bg-green-50 p-4 rounded-lg text-center">
+              <div className="text-2xl font-bold text-green-600">{statistics.createdToday}</div>
+              <div className="text-sm text-green-700">오늘 생성</div>
+            </div>
+            <div className="bg-blue-50 p-4 rounded-lg text-center">
+              <div className="text-2xl font-bold text-blue-600">{statistics.updatedToday}</div>
+              <div className="text-sm text-blue-700">오늘 수정</div>
+            </div>
+            <div className="bg-yellow-50 p-4 rounded-lg text-center">
+              <div className="text-2xl font-bold text-yellow-600">
+                {loading ? '⏳' : '✅'}
+              </div>
+              <div className="text-sm text-yellow-700">상태</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-bold mb-4 flex items-center text-teal-800">
+            <span className="text-2xl mr-2">⏰</span>
+            실시간 정보
+          </h3>
+          <div className="space-y-3">
+            <div className="bg-teal-50 p-3 rounded-lg">
+              <div className="font-semibold text-teal-700">현재 시간</div>
+              <div className="text-teal-600">{formattedCurrentTime}</div>
+            </div>
+            {todayHolidays.length > 0 && (
+              <div className="bg-red-50 p-3 rounded-lg">
+                <div className="font-semibold text-red-700">오늘의 공휴일</div>
+                {todayHolidays.map((holiday, index) => (
+                  <div key={index} className="text-red-600">{holiday.name}</div>
+                ))}
+              </div>
+            )}
+            <div className="bg-gray-50 p-3 rounded-lg">
+              <div className="font-semibold text-gray-700">Redux 연결</div>
+              <div className="flex items-center text-gray-600">
+                <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                실시간 동기화
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="text-center mb-8">
         <h2 className="text-4xl font-bold mb-4 typing-effect">Axios 사용 예제</h2>
         <p className="text-lg mb-6 text-gray-600">실시간 데이터 관리를 체험해보세요</p>
@@ -52,6 +125,41 @@ export default function Home() {
           <div className="flex items-center bg-white bg-opacity-80 px-3 py-1 rounded-full">
             <span className="text-sm font-semibold text-gray-700">Axios</span>
           </div>
+          <span className="text-2xl">+</span>
+          <div className="flex items-center bg-white bg-opacity-80 px-3 py-1 rounded-full">
+            <span className="text-sm font-semibold text-gray-700">Moment.js</span>
+          </div>
+        </div>
+        
+        {/* 추가 데모 페이지 링크 */}
+        <div className="flex justify-center space-x-4 mb-6 flex-wrap gap-2">
+          <Link
+            href="/axios-examples"
+            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 glitter-effect"
+          >
+            <span className="flex items-center">
+              <span className="mr-2">🔗</span>
+              Axios 고급 예제
+            </span>
+          </Link>
+          <Link
+            href="/moment-demo"
+            className="bg-gradient-to-r from-green-500 to-teal-600 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-teal-700 transition-all duration-300 transform hover:scale-105 glitter-effect"
+          >
+            <span className="flex items-center">
+              <span className="mr-2">⏰</span>
+              Moment.js 데모
+            </span>
+          </Link>
+          <Link
+            href="/redux-demo"
+            className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-600 hover:to-pink-700 transition-all duration-300 transform hover:scale-105 glitter-effect"
+          >
+            <span className="flex items-center">
+              <span className="mr-2">🏪</span>
+              Redux 데모
+            </span>
+          </Link>
         </div>
       </div>
       
@@ -177,13 +285,22 @@ export default function Home() {
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <div className="flex items-center mb-3">
-                      <span className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full mr-2">
-                        #{topic.id}
-                      </span>
-                      <span className="text-xs text-gray-400 font-mono">
-                        {new Date().toLocaleDateString()}
-                      </span>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center">
+                        <span className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full mr-2">
+                          #{topic.id}
+                        </span>
+                        {topic.createdAt && (
+                          <span className="text-xs text-gray-400 font-mono">
+                            {formatRelativeTime(topic.createdAt)}
+                          </span>
+                        )}
+                      </div>
+                      {topic.updatedAt && topic.updatedAt !== topic.createdAt && (
+                        <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                          수정됨
+                        </span>
+                      )}
                     </div>
                     <h4 className="font-bold text-xl mb-3 text-gray-800 leading-tight">
                       {topic.title}
@@ -191,9 +308,14 @@ export default function Home() {
                     <p className="text-gray-600 leading-relaxed mb-4">
                       {topic.body}
                     </p>
-                    <div className="flex items-center text-xs text-gray-400">
-                      <span className="mr-4">글자 수: {topic.body.length}</span>
+                    <div className="flex items-center text-xs text-gray-400 space-x-4">
+                      <span>글자 수: {topic.body.length}</span>
                       <span>ID: {topic.id}</span>
+                      {topic.createdAt && (
+                        <span title={formatKoreanDate(topic.createdAt)}>
+                          {formatRelativeTime(topic.createdAt)}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-col space-y-2 ml-6">
@@ -208,7 +330,7 @@ export default function Home() {
                       </span>
                     </Link>
                     <button 
-                      onClick={() => deleteTopic(topic.id)}
+                      onClick={() => handleDeleteTopic(topic.id)}
                       className="bg-gradient-to-r from-red-400 to-red-600 text-white px-4 py-2 rounded-lg hover:from-red-500 hover:to-red-700 transition-all duration-300 transform hover:scale-105 glitter-effect"
                       title="주제 삭제"
                     >
@@ -228,17 +350,17 @@ export default function Home() {
       <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 rounded-xl border border-blue-100">
         <h4 className="font-bold mb-4 text-blue-800 flex items-center text-lg">
           <span className="text-2xl mr-2">💡</span>
-          Axios 사용법 안내
+          Axios & Moment.js 사용법 안내
         </h4>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           <div className="space-y-4">
             <div className="bg-white bg-opacity-50 p-4 rounded-lg">
               <h5 className="font-semibold text-blue-700 mb-2 flex items-center">
                 <span className="mr-2">🚀</span>
                 서버 실행
               </h5>
-              <code className="block w-full">
-                npx json-server --watch db.json --port 3001
+              <code className="block w-full text-xs">
+                npm run dev:json
               </code>
             </div>
             <div className="bg-white bg-opacity-50 p-4 rounded-lg">
@@ -263,6 +385,22 @@ export default function Home() {
                 커스텀 훅
               </h5>
               <p className="text-sm text-gray-600">/src/hooks/useTopics.js 파일에서 훅 확인</p>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="bg-white bg-opacity-50 p-4 rounded-lg">
+              <h5 className="font-semibold text-green-700 mb-2 flex items-center">
+                <span className="mr-2">⏰</span>
+                Moment.js
+              </h5>
+              <p className="text-sm text-gray-600">/src/lib/moment-utils.js 파일에서 날짜 유틸리티 확인</p>
+            </div>
+            <div className="bg-white bg-opacity-50 p-4 rounded-lg">
+              <h5 className="font-semibold text-green-700 mb-2 flex items-center">
+                <span className="mr-2">📊</span>
+                데모 페이지
+              </h5>
+              <p className="text-sm text-gray-600">위 버튼으로 고급 예제 및 데모 확인</p>
             </div>
           </div>
         </div>

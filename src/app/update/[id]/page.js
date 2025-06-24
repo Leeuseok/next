@@ -1,7 +1,9 @@
 'use client'
 import { useRouter } from "next/navigation";
 import { useState, useEffect, use } from "react";
+import Link from "next/link";
 import axios from "axios";
+import { getCurrentKoreanTime, formatDateTime, formatRelativeTime, formatKoreanDate } from "../../../lib/moment-utils";
 
 export default function Update(props) {
     const router = useRouter();
@@ -11,6 +13,7 @@ export default function Update(props) {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState(null);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [originalData, setOriginalData] = useState(null);
     
     // React.use()를 사용해서 params Promise를 unwrap
     const params = use(props.params);
@@ -23,6 +26,7 @@ export default function Update(props) {
             const response = await axios.get(`http://localhost:3001/topics/${id}`);
             setTitle(response.data.title);
             setBody(response.data.body);
+            setOriginalData(response.data);
         } catch (err) {
             setError('주제를 불러오는데 실패했습니다.');
             console.error('Error fetching topic:', err);
@@ -48,7 +52,8 @@ export default function Update(props) {
             
             const response = await axios.patch(`http://localhost:3001/topics/${id}`, {
                 title: title.trim(),
-                body: body.trim()
+                body: body.trim(),
+                updatedAt: new Date().toISOString()
             });
 
             setShowSuccess(true);
@@ -98,8 +103,17 @@ export default function Update(props) {
             )}
 
             <div className="text-center mb-8">
-                <h2 className="text-4xl font-bold mb-4 typing-effect">주제 수정</h2>
-                <p className="text-lg text-gray-600">기존 주제의 내용을 수정해보세요</p>
+                <Link 
+                    href={`/read/${id}`}
+                    className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4 transition-colors"
+                >
+                    ← 상세보기로 돌아가기
+                </Link>
+                <h2 className="text-4xl font-bold mb-2 typing-effect">주제 수정</h2>
+                <p className="text-lg text-gray-600 mb-2">기존 주제의 내용을 수정해보세요</p>
+                <p className="text-sm text-gray-500">
+                    현재 시간: <span className="font-semibold text-blue-600">{getCurrentKoreanTime()}</span>
+                </p>
             </div>
 
             <div className="window">
@@ -109,10 +123,58 @@ export default function Update(props) {
                     <div className="window-control green"></div>
                 </div>
                 <div className="pt-8 p-6">
-                    <h3 className="text-xl font-semibold mb-6 flex items-center">
-                        <span className="text-2xl mr-2">🔄</span>
-                        주제 수정 (ID: {id})
-                    </h3>
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-xl font-semibold flex items-center">
+                            <span className="text-2xl mr-2">🔄</span>
+                            주제 수정 (ID: {id})
+                        </h3>
+                        {originalData && (
+                            <div className="text-right text-xs text-gray-500">
+                                {originalData.createdAt && (
+                                    <div>생성: {formatRelativeTime(originalData.createdAt)}</div>
+                                )}
+                                {originalData.updatedAt && originalData.updatedAt !== originalData.createdAt && (
+                                    <div>최종 수정: {formatRelativeTime(originalData.updatedAt)}</div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* 원본 정보 표시 */}
+                    {originalData && (
+                        <div className="bg-gray-50 p-4 rounded-lg mb-6 border">
+                            <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
+                                <span className="mr-2">📋</span>
+                                원본 정보
+                            </h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                {originalData.createdAt && (
+                                    <div>
+                                        <span className="font-medium text-blue-700">생성일:</span>
+                                        <div className="text-gray-600 mt-1">
+                                            {formatKoreanDate(originalData.createdAt)}
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                            {formatDateTime(originalData.createdAt)}
+                                        </div>
+                                    </div>
+                                )}
+                                {originalData.updatedAt && (
+                                    <div>
+                                        <span className="font-medium text-green-700">
+                                            {originalData.updatedAt === originalData.createdAt ? '생성일' : '최종 수정일'}:
+                                        </span>
+                                        <div className="text-gray-600 mt-1">
+                                            {formatKoreanDate(originalData.updatedAt)}
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                            {formatDateTime(originalData.updatedAt)}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     {error && (
                         <div className="alert alert-error mb-6 shake">

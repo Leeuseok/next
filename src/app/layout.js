@@ -1,6 +1,7 @@
 import { Control } from "./Control";
 import "./globals.css";
 import Link from "next/link";
+import { ReduxProvider } from "../components/ReduxProvider";
 
 export const metadata = {
   title: "Modern Web with Axios",
@@ -28,8 +29,9 @@ export default async function RootLayout({ children }) {
         />
       </head>
       <body>
-        <div className="min-h-screen">
-          <main className="container mx-auto px-4 py-6">
+        <ReduxProvider>
+          <div className="min-h-screen">
+            <main className="container mx-auto px-4 py-6">
             {/* 네비게이션 메뉴 */}
             <nav className="mb-6 p-6">
               <h3 className="font-semibold mb-4 flex items-center">
@@ -125,7 +127,8 @@ export default async function RootLayout({ children }) {
               </div>
             </div>
           </footer>
-        </div>
+          </div>
+        </ReduxProvider>
       </body>
     </html>
   );
